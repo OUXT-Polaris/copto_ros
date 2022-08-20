@@ -23,7 +23,7 @@ find_package(rclcpp_components REQUIRED)
 
 find_package(geometry_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
-find_package(copto_msgs REQUIRED)
+#find_package(copto_msgs REQUIRED)
 
 include_directories(include)
 
@@ -39,7 +39,7 @@ ament_target_dependencies(pid_component
   rclcpp_components
   geometry_msgs
   sensor_msgs
-  copto_msgs
+  #copto_msgs
 )
 
 rclcpp_components_register_nodes(
