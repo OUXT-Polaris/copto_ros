@@ -27,10 +27,10 @@ int main(int argc, char * argv[])
   auto copto_mix = std::make_shared<copto_mix::MIXComponent>(options);
   ;
   auto copto_quat = std::make_shared<copto_quat::QUATComponent>(options);
-
+  exec.add_node(copto_quat);
   exec.add_node(copto_pid);
   exec.add_node(copto_mix);
-  exec.add_node(copto_quat);
+  
 
   exec.spin();
   rclcpp::shutdown();

@@ -33,7 +33,7 @@ PIDComponent::PIDComponent(const rclcpp::NodeOptions & options) : Node("copto_pi
   JOYsubscription_ = this->create_subscription<sensor_msgs::msg::Joy>(
     "/joy", 10, std::bind(&PIDComponent::JOYtopic_callback, this, std::placeholders::_1));
 
-  CTLpublisher_ = this->create_publisher<std_msgs::msg::Float32MultiArray>("/copto/ctl_val", 1);
+  CTLpublisher_ = this->create_publisher<std_msgs::msg::Float32MultiArray>("/copto/ctl_val", 10);
 
   timer_ = this->create_wall_timer(10ms, std::bind(&PIDComponent::update, this));
 }
@@ -55,6 +55,7 @@ void PIDComponent::POSEtopic_callback(
   // std::cout << pitch_*180/3.14 << std::endl;
   yawrate_ = yaw_old - yaw_;
   yaw_old = yaw_;
+  
 }
 
 void PIDComponent::JOYtopic_callback(const sensor_msgs::msg::Joy::SharedPtr msg)
@@ -63,10 +64,17 @@ void PIDComponent::JOYtopic_callback(const sensor_msgs::msg::Joy::SharedPtr msg)
   ctl_yawrate = msg->axes[0] * MAX_YAWRATE;
   ctl_pitch = msg->axes[5] * MAX_PITCH;
   ctl_roll = msg->axes[6] * MAX_ROLL;
+  
 }
 
 void PIDComponent::update()
 {
+  // std::cout<< "roll:  " << roll_ << std::endl;
+  // std::cout<< "pitch:  " << pitch_ << std::endl;
+  // std::cout<< "yaw:  " << yaw_ << std::endl;
+  // std::cout<< "roll_ctl:  " << ctl_roll << std::endl;
+  // std::cout<< "pitch_ctl:  " << ctl_pitch << std::endl;
+  // std::cout<< "yaw_ctl:  " << ctl_yawrate << std::endl;
   double e_pitch_new, e_roll_new, e_yawrate_new;
 
   // culc error
@@ -79,9 +87,13 @@ void PIDComponent::update()
   ctl_val.data.resize(4);
   ctl_val.data[3] = ctl_thrott;
   // pose pd control
-  ctl_val.data[2] = Kp_y * e_yawrate_new + Kd_y * (e_yawrate_old - e_yawrate_new) / dt;
+  // ctl_val.data[2] = Kp_y * e_yawrate_new + Kd_y * (e_yawrate_old - e_yawrate_new) / dt;
+  // ctl_val.data[0] = Kp_r * e_roll_new + Kd_r * (e_roll_old - e_roll_new) / dt;
+  // ctl_val.data[1] = Kp_p * e_pitch_new + Kd_p * (e_pitch_old - e_pitch_new) / dt;
+
+  ctl_val.data[2] = 0;
   ctl_val.data[0] = Kp_r * e_roll_new + Kd_r * (e_roll_old - e_roll_new) / dt;
-  ctl_val.data[1] = Kp_p * e_pitch_new + Kd_p * (e_pitch_old - e_pitch_new) / dt;
+  ctl_val.data[1] = 0;
 
   // std::cout<<"roll:" << ctl_val.data[0] << std::endl;
   // std::cout<<"pitch:" << ctl_val.data[1] << std::endl;

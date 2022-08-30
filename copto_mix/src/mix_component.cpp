@@ -61,7 +61,7 @@ void MIXComponent::update()
   }
 
   T = M.inverse() * A * u;
-
+  
   // r p y t
   std_msgs::msg::Float32MultiArray pwm;
   pwm.data.resize(4);
@@ -69,6 +69,14 @@ void MIXComponent::update()
   pwm.data[1] = 10 * T(1) + 1100;
   pwm.data[2] = 10 * T(2) + 1100;
   pwm.data[3] = 10 * T(3) + 1100;
+  for(int i = 0;i<4;i++){
+    if(pwm.data[i]<1100){
+      pwm.data[i] = 1100;
+    }
+    if(pwm.data[i]>2000){
+      pwm.data[i] = 2000;
+    }
+  }
   PWMpublisher_->publish(pwm);
 }
 
