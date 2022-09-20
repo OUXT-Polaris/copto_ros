@@ -84,13 +84,13 @@ private:
   rclcpp::TimerBase::SharedPtr timer_;
 
   double l = 0.15;
-  double c = 0.01;
+  double c = 0.001;
 
-  double a_r = 150;
-  double a_p = 150;
+  double a_r = 100;
+  double a_p = 100;
 
-  double a_y = 150;
-  double a_th = 1;
+  double a_y = 100;
+  double a_th = 5;
 };
 }  // namespace copto_mix
 

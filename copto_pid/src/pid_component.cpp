@@ -53,15 +53,15 @@ void PIDComponent::POSEtopic_callback(
   quat = msg->pose.pose.orientation;
   getEulerRPY(quat, roll_, pitch_, yaw_);
   // std::cout << pitch_*180/3.14 << std::endl;
-  yawrate_ = yaw_old - yaw_;
-  yaw_old = yaw_;
+  // yawrate_ = yaw_old - yaw_;
+  // yaw_old = yaw_;
   
 }
 
 void PIDComponent::JOYtopic_callback(const sensor_msgs::msg::Joy::SharedPtr msg)
 {
   ctl_thrott = -(msg->axes[3] - 1) / 2 * THROTT_RANGE + MIN_THROTT;
-  ctl_yawrate = msg->axes[0] * MAX_YAWRATE;
+  ctl_yaw = msg->axes[0] * MAX_YAWRATE;
   ctl_pitch = msg->axes[5] * MAX_PITCH;
   ctl_roll = msg->axes[6] * MAX_ROLL;
   
@@ -75,10 +75,10 @@ void PIDComponent::update()
   // std::cout<< "roll_ctl:  " << ctl_roll << std::endl;
   // std::cout<< "pitch_ctl:  " << ctl_pitch << std::endl;
   // std::cout<< "yaw_ctl:  " << ctl_yawrate << std::endl;
-  double e_pitch_new, e_roll_new, e_yawrate_new;
+  double e_pitch_new, e_roll_new, e_yaw_new;
 
   // culc error
-  e_yawrate_new = ctl_yawrate - yawrate_;
+  e_yaw_new = ctl_yaw - yaw_;
   e_pitch_new = ctl_pitch - pitch_;
   e_roll_new = ctl_roll - roll_;
 
@@ -87,20 +87,16 @@ void PIDComponent::update()
   ctl_val.data.resize(4);
   ctl_val.data[3] = ctl_thrott;
   // pose pd control
-  // ctl_val.data[2] = Kp_y * e_yawrate_new + Kd_y * (e_yawrate_old - e_yawrate_new) / dt;
-  // ctl_val.data[0] = Kp_r * e_roll_new + Kd_r * (e_roll_old - e_roll_new) / dt;
-  // ctl_val.data[1] = Kp_p * e_pitch_new + Kd_p * (e_pitch_old - e_pitch_new) / dt;
-
-  ctl_val.data[2] = 0;
+  ctl_val.data[2] = Kp_y * e_yaw_new + Kd_y * (e_yaw_old - e_yaw_new) / dt;
   ctl_val.data[0] = Kp_r * e_roll_new + Kd_r * (e_roll_old - e_roll_new) / dt;
-  ctl_val.data[1] = 0;
+  ctl_val.data[1] = Kp_p * e_pitch_new + Kd_p * (e_pitch_old - e_pitch_new) / dt;
 
-  // std::cout<<"roll:" << ctl_val.data[0] << std::endl;
-  // std::cout<<"pitch:" << ctl_val.data[1] << std::endl;
-  // std::cout<<"yaw:" << ctl_val.data[2] << std::endl;
+  // ctl_val.data[2] = 0;
+  // ctl_val.data[0] = Kp_r * e_roll_new + Kd_r * (e_roll_old - e_roll_new) / dt;
+  // ctl_val.data[1] = Kp_p * e_pitch_new + Kd_p * (e_pitch_old - e_pitch_new) / dt;;
 
   CTLpublisher_->publish(ctl_val);
-  e_yawrate_old = e_yawrate_new;
+  e_yaw_old = e_yaw_new;
   e_pitch_old = e_pitch_new;
   e_roll_old = e_roll_new;
 }
