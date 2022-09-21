@@ -70,11 +70,19 @@ public:
   double roll_ = 0;
   double pitch_ = 0;
   double yaw_ = 0;
-  double THROTT_RANGE = 5 * 4;  //N
-  double MIN_THROTT = 0.5 * 4;
-  double MAX_YAWRATE = 3 * 3.14 / 180;  //rad/s
-  double MAX_ROLL = 10 * 3.14 / 180;    // rad
-  double MAX_PITCH = 10 * 3.14 / 180;   // rad
+  double roll_old = 0;
+  double pitch_old = 0;
+  double yaw_old = 0;
+
+  double rollrate_ = 0;
+  double pitchrate_ = 0;
+  double yawrate_ = 0;
+
+  double THROTT_RANGE = 10 * 4;  //N
+  double MIN_THROTT = 0.2 * 4;
+  double MAX_YAWRATE = 20 * 3.14 / 180;  //rad/s
+  double MAX_ROLL = 20 * 3.14 / 180;    // rad
+  double MAX_PITCH = 20 * 3.14 / 180;   // rad
 
   double e_pitch_old;
   double e_roll_old;
@@ -95,14 +103,14 @@ private:
   rclcpp::TimerBase::SharedPtr timer_;
   double dt = 0.01;
   //pid gain
-  double Kp_y = 0.0018;
-  double Kd_y = 0.00036;
+  double Kp_y = 0.18;
+  double Kd_y = 0.0016;
 
   double Kp_r = 0.135;
-  double Kd_r = 0.036;
+  double Kd_r = 0.0016;
 
   double Kp_p = 0.135;
-  double Kd_p = 0.036;
+  double Kd_p = 0.0016;
 };
 }  // namespace copto_pid
 
